@@ -1,10 +1,10 @@
 import requests
 import pytest
+import json
 
 
 class Initialization:
     base_url = 'https://sellermetrix.com/api/v2/cached-reports/'
-    test_url = 'https://sellermetrix.com/api/v2/cached-reports/152639208234760442622368130610826426839'
     JWTtoken = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBlcm9sYS5lcmljc3NvbkBnbWFpbC5jb2" \
                "0iLCJpYXQiOjE2NDQyOTkxMzgsImV4cCI6MTY0Njg5MTEzOCwianRpIjoiNDUwYTMyZGUtMTVkNi00NjI4LTkzMDct" \
                "YzFkZjQ0MGRlNDAwIiwidXNlcl9pZCI6MTUsInVzZXJfcHJvZmlsZV9pZCI6WzEzXSwib3JpZ19pYXQiOjE2NDQyOTk" \
@@ -58,8 +58,8 @@ class TestRequest:
     def test_second_api_get(self, dataparam):
         second_response = requests.get(Initialization.base_url, params=dataparam,
                                        headers=Initialization.headersauthorized)
-        print(dataparam)
         print(second_response.json())
+        print(dataparam)
         for i in second_response.json():
             print(i)
             if i['end'] == dataparam['end']:
@@ -67,8 +67,9 @@ class TestRequest:
                 if i['name'] == 'Profit & Loss':
                     print(i)
                     Initialization.reports = i['id']
+                    print(Initialization.reports)
+
         print(second_response.status_code)
-        print(Initialization.reports)
         print("______________________________________________________________________________")
 
     @pytest.mark.parametrize("dataparam", Initialization.datatup)
@@ -76,5 +77,6 @@ class TestRequest:
         url_download = Initialization.base_url + str(Initialization.reports)
         third_response = requests.get(url_download, params=dataparam,
                                       headers=Initialization.headersauthorized)
-        print(third_response.text)
-        print(third_response.status_code)
+        print(third_response.json())
+        myfile = open("Reports.json", "w+")
+        myfile.write(json.dumps(third_response.json()))
