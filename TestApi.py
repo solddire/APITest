@@ -2,6 +2,8 @@ import requests
 import pytest
 import json
 
+from requests import JSONDecodeError
+
 
 class Initialization:
     base_url = 'https://sellermetrix.com/api/v2/cached-reports/'
@@ -74,9 +76,13 @@ class TestRequest:
 
     @pytest.mark.parametrize("dataparam", Initialization.datatup)
     def test_third_api_get(self, dataparam):
-        url_download = Initialization.base_url + str(Initialization.reports)
-        third_response = requests.get(url_download, params=dataparam,
-                                      headers=Initialization.headersauthorized)
-        print(third_response.json())
-        myfile = open("Reports.json", "w+")
-        myfile.write(json.dumps(third_response.json()))
+        try:
+            url_download = Initialization.base_url + str(Initialization.reports)
+            third_response = requests.get(url_download, params=dataparam,
+                                          headers=Initialization.headersauthorized)
+            print(third_response.json())
+            myfile = open("Reports.json", "w+")
+            myfile.write(json.dumps(third_response.json()))
+        except JSONDecodeError:
+            print("Репорту не присвоился id! "
+                  "Данный запрос не получает нужных данных! id: " + str(Initialization.reports))
